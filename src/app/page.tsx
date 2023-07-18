@@ -27,7 +27,7 @@ export default function Home() {
     return (
         <main className="flex min-h-screen flex-col items-center justify-between p-8 md:p-16">
             <div className="z-10 w-full max-w-6xl items-center font-mono text-sm md:flex items-baseline">
-                <p className="text-2xl mb-2 flex-grow">sACN Scene Recorder</p>
+                <p className="text-2xl mb-2 flex-grow">sACN Viewer</p>
                 <p className="mb-2 mr-3">Status: {connectionStatus}</p>
                 <div className="text-right">
                     <button
@@ -89,7 +89,7 @@ export default function Home() {
             </div>
 
             <div className="relative flex place-items-center text-slate-50 text-opacity-50 mt-3">
-                <small>sACN Viewver v1.0</small>
+                <small>sACN Viewer v1.0</small>
             </div>
         </main>
     );
