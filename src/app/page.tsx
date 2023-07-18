@@ -1,6 +1,6 @@
 'use client';
 
-import { DmxUniverseData, UniverseData } from '@/models';
+import { UniverseData } from '@/models';
 import { useState } from 'react';
 import useWebSocket, { ReadyState } from 'react-use-websocket';
 
@@ -10,7 +10,7 @@ export default function Home() {
     const [isEditing, setIsEditing] = useState(false);
 
     const webSocketUrl = 'ws://' + process.env.NEXT_PUBLIC_HOST + ':8081';
-    const { lastJsonMessage, lastMessage, readyState } = useWebSocket<UniverseData>(webSocketUrl, {
+    const { lastJsonMessage, readyState } = useWebSocket<UniverseData>(webSocketUrl, {
         shouldReconnect: () => true,
     });
     const connectionStatus = {
@@ -89,7 +89,7 @@ export default function Home() {
             </div>
 
             <div className="relative flex place-items-center text-slate-50 text-opacity-50 mt-3">
-                <small>sACN Scene Recorder v0.1</small>
+                <small>sACN Viewver v1.0</small>
             </div>
         </main>
     );
