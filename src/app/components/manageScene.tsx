@@ -15,7 +15,6 @@ const ManageScene: FC<Props> = ({ disabled, sceneToEdit, setSceneToEdit, sendCom
     const universes: number[] = JSON.parse(process.env.NEXT_PUBLIC_UNIVERSES_JSON ?? '[1]');
     const [selectedUniverses, setSelectedUniverses] = useState<number[]>(universes);
 
-
     return (
         <form className="bg-white shadow-md rounded px-6 pt-4 pb-6 mb-4 w-full">
             <div className="flex justify-between">
@@ -118,7 +117,8 @@ const ManageScene: FC<Props> = ({ disabled, sceneToEdit, setSceneToEdit, sendCom
                                             (selectedUniverses.some((x) => x === universeId)
                                                 ? 'bg-teal-500 hover:bg-teal-700'
                                                 : 'bg-indigo-500 hover:bg-indigo-700')
-                                        }                                        type="button"
+                                        }
+                                        type="button"
                                         onClick={() => {
                                             setSelectedUniverses((universes) =>
                                                 universes.some((x) => x === universeId)
@@ -146,21 +146,21 @@ const ManageScene: FC<Props> = ({ disabled, sceneToEdit, setSceneToEdit, sendCom
                             >
                                 Save DMX
                             </button>
-                        <button
-                            className="bg-indigo-500 hover:bg-indigo-700 disabled:bg-gray-700 text-xs text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-3 w-full"
-                            type="button"
-                            onClick={() => {
-                                sendCommand({
-                                    type: 'removeDmx',
-                                    sceneId: sceneToEdit.id,
-                                    universes: selectedUniverses,
-                                });
-                            }}
-                            disabled={disabled || selectedUniverses.length === 0}
+                            <button
+                                className="bg-indigo-500 hover:bg-indigo-700 disabled:bg-gray-700 text-xs text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline mt-3 w-full"
+                                type="button"
+                                onClick={() => {
+                                    sendCommand({
+                                        type: 'removeDmx',
+                                        sceneId: sceneToEdit.id,
+                                        universes: selectedUniverses,
+                                    });
+                                }}
+                                disabled={disabled || selectedUniverses.length === 0}
                             >
-                            Remove DMX
-                        </button>
-                            </div>
+                                Remove DMX
+                            </button>
+                        </div>
                         <button
                             className="bg-red-500 hover:bg-red-700 disabled:bg-gray-700 text-xs text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                             type="button"

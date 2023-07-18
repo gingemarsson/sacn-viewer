@@ -1,30 +1,23 @@
 import express from 'express';
 import next from 'next';
 import { dmxReceived } from './business-logic/redux/currentDmxSlice';
-import { getDmxDataToSendForUniverse, reloadScenes } from './business-logic/redux/scenesSlice';
 import { observeStore, store } from './business-logic/redux/store';
 import { configureWebsockets } from './business-logic/websockets';
-import { readScenes, saveScenes } from './lib/database';
-import { ReceiverConfiguration, SenderConfiguration } from './models';
+import { ReceiverConfiguration } from './models';
 import { configureReceiver } from './sacn/sacnReceiver';
-import { configureSender } from './sacn/sacnSender';
 
-const port = parseInt(process?.env?.PORT ?? '3000', 10);
+const port = parseInt(process?.env?.PORT ?? '3001', 10);
 const dev = process.env.NODE_ENV !== 'production';
 const app = next({ dev });
 const handle = app.getRequestHandler();
 
 const logPrefix = '[INFO]';
-const appName = 'sACN Scene Recorder';
+const appName = 'sACN Scene Viewver';
 const universes = JSON.parse(process.env.NEXT_PUBLIC_UNIVERSES_JSON ?? '[1]');
 const priority = 90;
 
 app.prepare().then(async () => {
     const server = express();
-
-    // Load state from SQLite
-    //
-    await reloadScenesFromDataBase();
 
     // Configure sACN
     //
@@ -33,60 +26,22 @@ app.prepare().then(async () => {
         appName: appName,
         onReceive: (dmxUniverseState) => {
             store.dispatch(dmxReceived(dmxUniverseState));
+
+            websocketsData.broadcast(JSON.stringify(store.getState().currentDmx), false);
         },
     };
     configureReceiver(receiverConfiguration);
 
-    const senderConfiguration: SenderConfiguration = {
-        universes: universes,
-        appName: appName,
-        priority: priority,
-        getDmxDataToSendForUniverse: (universeId: number) => getDmxDataToSendForUniverse(store.getState(), universeId),
-    };
-    const { startSending, stopSending, sendOnce } = configureSender(senderConfiguration);
-    startSending();
-
     // Configure WebSockets
     //
-    const websocketsData = configureWebsockets(store);
-
-    observeStore(
-        store,
-        (x) => x.scenes,
-        async (scenes) => {
-            sendOnce();
-            websocketsData.broadcast(JSON.stringify(scenes), false);
-            await saveScenes(scenes);
-        },
-    );
+    const websocketsData = configureWebsockets();
 
     // Configure next js
     //
-    server.all('/api/getCurrentState', (_req, res) => {
-        res.send(store.getState());
-    });
-
-    server.all('/api/stopSending', (_req, res) => {
-        stopSending();
-        console.log(logPrefix, 'Stop sending sACN');
-        res.send('Stopped');
-    });
-
-    server.all('/api/startSending', (_req, res) => {
-        startSending();
-        console.log(logPrefix, 'Start sending sACN');
-        res.send('Stopped');
-    });
-
     server.all('/api/resetWebSockets', async (_req, res) => {
         websocketsData.closeAll();
         console.log(logPrefix, 'Close all WebSockets');
         res.send('WebSockets closed');
-    });
-
-    server.all('/api/reloadFromDatabase', async (_req, res) => {
-        await reloadScenesFromDataBase();
-        res.send('Reloaded');
     });
 
     server.all('*', (req, res) => {
@@ -97,8 +52,3 @@ app.prepare().then(async () => {
         console.log(`> Ready on http://localhost:${port}`);
     });
 });
-
-async function reloadScenesFromDataBase() {
-    console.log(logPrefix, 'Reloading configuration');
-    store.dispatch(reloadScenes(await readScenes()));
-}

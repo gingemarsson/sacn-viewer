@@ -1,11 +1,9 @@
 import { configureStore, Store } from '@reduxjs/toolkit';
 import currentDmxSlice from './currentDmxSlice';
-import scenesSlice from './scenesSlice';
 
 export const store = configureStore({
     reducer: {
         currentDmx: currentDmxSlice,
-        scenes: scenesSlice,
     },
 });
 
